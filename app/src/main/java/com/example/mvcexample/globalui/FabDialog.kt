@@ -1,4 +1,4 @@
-package com.example.mvcexample.composables
+package com.example.mvcexample.globalui
 
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
@@ -8,7 +8,10 @@ import androidx.compose.material.Icon
 import androidx.compose.material.Surface
 import androidx.compose.material.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.clip
+import androidx.compose.ui.draw.shadow
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.colorResource
 import androidx.compose.ui.res.painterResource
@@ -17,14 +20,11 @@ import com.example.mvcexample.R
 
 
 @Composable
-fun FabDialog(taskPicked: () -> Unit, listPicked: () -> Unit) {
+fun FabDialog(taskPicked: () -> Unit, listPicked: () -> Unit, modifier: Modifier = Modifier) {
     Surface(
-        modifier = Modifier
-            .fillMaxWidth(0.5f)
-            .aspectRatio(2f)
-            .offset((-20).dp, (-100).dp),
-        elevation = 5.dp,
-        shape = RoundedCornerShape(5.dp)
+        modifier = modifier,
+        elevation = 3.dp,
+        shape = RoundedCornerShape(10.dp)
     ) {
         Column(
             modifier = Modifier.fillMaxWidth(),

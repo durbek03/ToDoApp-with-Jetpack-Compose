@@ -18,12 +18,13 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import com.example.mvcexample.MainViewModel
 import com.example.mvcexample.R
 import com.example.mvcexample.room.entity.Category
 import com.example.mvcexample.room.entity.CategoryWithTask
 import com.example.mvcexample.room.entity.Task
 
-class HomeScreen(val categoryList: List<CategoryWithTask>, val taskList: List<Task>) {
+class HomeScreen(val viewModel: MainViewModel, val categoryList: List<CategoryWithTask>?) {
 
     @ExperimentalAnimationApi
     @Composable
@@ -33,7 +34,7 @@ class HomeScreen(val categoryList: List<CategoryWithTask>, val taskList: List<Ta
                 .fillMaxSize()
         ) {
             TopAppBar()
-            if (categoryList.isNotEmpty()) {
+            if (!categoryList.isNullOrEmpty()) {
                 TodayTasks()
             } else {
                 Text(
@@ -81,21 +82,21 @@ class HomeScreen(val categoryList: List<CategoryWithTask>, val taskList: List<Ta
     fun TodayTasks() {
         LazyColumn(modifier = Modifier.fillMaxWidth()) {
 
-            itemsIndexed(taskList) { index, task ->
-                TaskItem(task)
-            }
+//            itemsIndexed(taskList) { index, task ->
+//                TaskItem(task)
+//            }
 
             item {
                 Spacer(modifier = Modifier.height(20.dp))
                 Text(
                     text = "Lists",
-                    color = Color.LightGray,
+                    color = Color.Gray,
                     fontWeight = FontWeight.Bold,
                     modifier = Modifier.padding(63.dp, 0.dp, 0.dp, 0.dp)
                 )
                 Spacer(modifier = Modifier.height(10.dp))
             }
-            itemsIndexed(categoryList) { index, category ->
+            itemsIndexed(categoryList!!) { index, category ->
                 CategoryItem(category.category, category.taskList.size)
                 Spacer(modifier = Modifier.height(10.dp))
             }
@@ -147,7 +148,7 @@ class HomeScreen(val categoryList: List<CategoryWithTask>, val taskList: List<Ta
     fun CategoryItem(category: Category, taskCount: Int) {
         Surface(
             shape = RoundedCornerShape(5.dp),
-            color = Color.LightGray,
+            color = colorResource(id = category.backgroundColor!!),
             modifier = Modifier
                 .fillMaxWidth()
                 .padding(63.dp, 0.dp, 10.dp, 0.dp)

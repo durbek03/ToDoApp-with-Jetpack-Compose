@@ -1,20 +1,25 @@
 package com.example.mvcexample.room.dao
 
+import androidx.lifecycle.LiveData
 import androidx.room.*
 import com.example.mvcexample.room.entity.Category
 import com.example.mvcexample.room.entity.CategoryWithTask
+import kotlinx.coroutines.flow.Flow
 
 @Dao
 interface CategoryDao {
     @Insert
-    fun addCategory(category: Category)
+    suspend fun addCategory(category: Category)
 
     @Delete
-    fun deleteCategory(category: Category)
+    suspend fun deleteCategory(category: Category)
 
     @Update
-    fun updateCategory(category: Category)
+    suspend fun updateCategory(category: Category)
 
     @Query("select * from Category")
-    suspend fun getAllDataFromCategory(): List<CategoryWithTask>
+    fun getAllDataFromCategory(): Flow<List<CategoryWithTask>>
+
+    @Query("select * from category where categoryName = :categoryName")
+    fun checkIfCategoryNameExists(categoryName: String): LiveData<Category>?
 }

@@ -1,4 +1,4 @@
-package com.example.mvcexample
+package com.example.mvcexample.globalui
 
 enum class FabState {
     ROTATED,
