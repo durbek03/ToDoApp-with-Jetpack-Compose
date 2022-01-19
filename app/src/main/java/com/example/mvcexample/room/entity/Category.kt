@@ -1,5 +1,6 @@
 package com.example.mvcexample.room.entity
 
+import androidx.compose.runtime.MutableState
 import androidx.room.ColumnInfo
 import androidx.room.Entity
 import androidx.room.PrimaryKey

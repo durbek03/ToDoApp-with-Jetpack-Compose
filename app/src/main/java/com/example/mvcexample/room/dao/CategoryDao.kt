@@ -21,5 +21,5 @@ interface CategoryDao {
     fun getAllDataFromCategory(): Flow<List<CategoryWithTask>>
 
     @Query("select * from category where categoryName = :categoryName")
-    fun checkIfCategoryNameExists(categoryName: String): LiveData<Category>?
+    suspend fun checkIfCategoryNameExists(categoryName: String): Category?
 }

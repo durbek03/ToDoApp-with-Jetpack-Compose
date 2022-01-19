@@ -1,4 +1,4 @@
-package com.example.mvcexample.home
+package com.example.mvcexample.composableUi
 
 import androidx.compose.animation.ExperimentalAnimationApi
 import androidx.compose.foundation.background
@@ -18,13 +18,13 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import com.example.mvcexample.MainViewModel
 import com.example.mvcexample.R
+import com.example.mvcexample.globalui.CategoryItem
 import com.example.mvcexample.room.entity.Category
 import com.example.mvcexample.room.entity.CategoryWithTask
 import com.example.mvcexample.room.entity.Task
 
-class HomeScreen(val viewModel: MainViewModel, val categoryList: List<CategoryWithTask>?) {
+class HomeScreen(val categoryList: List<CategoryWithTask>?, val taskList: List<Task>?) {
 
     @ExperimentalAnimationApi
     @Composable
@@ -82,9 +82,11 @@ class HomeScreen(val viewModel: MainViewModel, val categoryList: List<CategoryWi
     fun TodayTasks() {
         LazyColumn(modifier = Modifier.fillMaxWidth()) {
 
-//            itemsIndexed(taskList) { index, task ->
-//                TaskItem(task)
-//            }
+            if (taskList != null) {
+                itemsIndexed(taskList) { index, task ->
+                    TaskItem(task)
+                }
+            }
 
             item {
                 Spacer(modifier = Modifier.height(20.dp))
@@ -117,13 +119,10 @@ class HomeScreen(val viewModel: MainViewModel, val categoryList: List<CategoryWi
                         .clip(shape = RoundedCornerShape(50.dp))
                         .fillMaxWidth(0.08f)
                         .aspectRatio(1f)
-                        .background(colorResource(id = R.color.blue))
-                        .padding(7.dp),
+                        .background(colorResource(id = R.color.white)),
                     painter = painterResource(id = R.drawable.ic_marked),
                     contentDescription = "ic_tick",
-                    tint = colorResource(
-                        id = R.color.white
-                    )
+                    tint = colorResource(id = R.color.blue)
                 )
                 Column(modifier = Modifier.fillMaxWidth(0.8f)) {
                     Text(text = task.title!!)
@@ -140,27 +139,7 @@ class HomeScreen(val viewModel: MainViewModel, val categoryList: List<CategoryWi
                 }
             }
             Spacer(modifier = Modifier.height(8.dp))
-            Divider(thickness = 0.5.dp, color = Color.Gray, startIndent = 63.dp)
         }
-    }
-
-    @Composable
-    fun CategoryItem(category: Category, taskCount: Int) {
-        Surface(
-            shape = RoundedCornerShape(5.dp),
-            color = colorResource(id = category.backgroundColor!!),
-            modifier = Modifier
-                .fillMaxWidth()
-                .padding(63.dp, 0.dp, 10.dp, 0.dp)
-        ) {
-            Column(
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .padding(10.dp)
-            ) {
-                Text(text = category.categoryName!!)
-                Text(text = taskCount.toString())
-            }
-        }
+        Divider(thickness = 0.5.dp, color = Color.Gray, startIndent = 63.dp)
     }
 }

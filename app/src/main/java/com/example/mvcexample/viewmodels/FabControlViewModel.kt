@@ -1,18 +1,25 @@
-package com.example.mvcexample
+package com.example.mvcexample.viewmodels
 
 import androidx.compose.runtime.*
 import androidx.compose.ui.graphics.Color
 import androidx.lifecycle.ViewModel
+import com.example.mvcexample.R
 import com.example.mvcexample.globalui.FabState
 
 class FabControlViewModel: ViewModel() {
     //fab General
     var fabState by mutableStateOf(FabState.NOTROTATED)
 
+    var fabVisibility by mutableStateOf(true)
+
     var showFabDialog by mutableStateOf(false)
 
     fun setFabstate(state: FabState) {
         fabState = state
+    }
+
+    fun setFabvisibility(visible: Boolean) {
+        fabVisibility = visible
     }
 
     fun setShowFabdialog(show: Boolean) {

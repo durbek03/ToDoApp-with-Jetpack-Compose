@@ -1,4 +1,4 @@
-package com.example.mvcexample
+package com.example.mvcexample.viewmodels
 
 import android.app.Application
 import androidx.compose.runtime.mutableStateOf
@@ -21,9 +21,9 @@ class MainViewModel: ViewModel() {
         categoryList.value = list
     }
 
-    var taskList by mutableStateOf(listOf<Task>())
+    var taskList: MutableLiveData<List<Task>> = MutableLiveData()
 
     fun setTasklist(list: List<Task>) {
-        taskList = list
+        taskList.value = list
     }
 }

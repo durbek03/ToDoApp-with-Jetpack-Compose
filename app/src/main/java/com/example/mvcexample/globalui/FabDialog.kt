@@ -17,10 +17,11 @@ import androidx.compose.ui.res.colorResource
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.unit.dp
 import com.example.mvcexample.R
+import com.example.mvcexample.utils.DialogItemPicker
 
 
 @Composable
-fun FabDialog(taskPicked: () -> Unit, listPicked: () -> Unit, modifier: Modifier = Modifier) {
+fun FabDialog(picker: DialogItemPicker, modifier: Modifier = Modifier) {
     Surface(
         modifier = modifier,
         elevation = 3.dp,
@@ -33,7 +34,7 @@ fun FabDialog(taskPicked: () -> Unit, listPicked: () -> Unit, modifier: Modifier
             Row(modifier = Modifier
                 .fillMaxWidth()
                 .clickable {
-                    taskPicked.invoke()
+                    picker.taskPicked()
                 }) {
                 Spacer(modifier = Modifier.width(10.dp))
                 Icon(
@@ -48,7 +49,7 @@ fun FabDialog(taskPicked: () -> Unit, listPicked: () -> Unit, modifier: Modifier
             Row(modifier = Modifier
                 .fillMaxWidth()
                 .clickable {
-                    listPicked.invoke()
+                    picker.listPicked()
                 }) {
                 Spacer(modifier = Modifier.width(10.dp))
                 Icon(

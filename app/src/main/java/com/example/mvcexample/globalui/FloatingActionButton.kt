@@ -5,34 +5,25 @@ import androidx.compose.animation.ExperimentalAnimationApi
 import androidx.compose.animation.animateColorAsState
 import androidx.compose.animation.core.animateFloatAsState
 import androidx.compose.foundation.layout.*
-import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.Icon
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.draw.clip
 import androidx.compose.ui.draw.rotate
-import androidx.compose.ui.draw.shadow
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.unit.dp
-import com.example.mvcexample.FabControlViewModel
-import com.example.mvcexample.MainViewModel
+import com.example.mvcexample.viewmodels.FabControlViewModel
 import com.example.mvcexample.R
+import com.example.mvcexample.utils.DialogItemPicker
 
 @ExperimentalAnimationApi
 @Composable
-fun CustomFloatingActionButton(viewModel: FabControlViewModel) {
+fun CustomFloatingActionButton(viewModel: FabControlViewModel, picker: DialogItemPicker) {
     Box(modifier = Modifier.fillMaxSize(), contentAlignment = Alignment.BottomEnd) {
         AnimatedVisibility(visible = viewModel.showFabDialog) {
-            FabDialog({
-                viewModel.setFabstate(FabState.NOTROTATED)
-                viewModel.setShowListdialog(true)
-            }, {
-                viewModel.setFabstate(FabState.NOTROTATED)
-
-            }, modifier = Modifier
+            FabDialog(picker, modifier = Modifier
                 .fillMaxWidth(0.5f)
                 .aspectRatio(2f)
                 .offset((-20).dp, (-100).dp)

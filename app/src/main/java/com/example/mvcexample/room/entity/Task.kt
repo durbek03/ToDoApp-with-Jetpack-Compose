@@ -19,4 +19,13 @@ class Task {
     var time: String? = null
     @ColumnInfo
     var color: Int? = null
+
+    constructor()
+    constructor(categoryId: Int?, title: String?, date: String?, time: String?, color: Int?) {
+        this.categoryId = categoryId
+        this.title = title
+        this.date = date
+        this.time = time
+        this.color = color
+    }
 }
