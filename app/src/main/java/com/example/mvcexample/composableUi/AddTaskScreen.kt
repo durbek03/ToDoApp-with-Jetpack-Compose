@@ -33,6 +33,7 @@ import com.example.mvcexample.R
 import com.example.mvcexample.room.entity.CategoryWithTask
 import com.example.mvcexample.viewmodels.AddTaskViewModel
 import com.example.mvcexample.viewmodels.MainViewModel
+import com.google.accompanist.systemuicontroller.rememberSystemUiController
 
 @ExperimentalAnimationApi
 class AddTaskScreen(
@@ -45,7 +46,8 @@ class AddTaskScreen(
 
     @Composable
     fun AddTaskScreen() {
-        Log.d(TAG, "AddTaskScreen: taskscreeen")
+        val uiController = rememberSystemUiController()
+        uiController.setStatusBarColor(Color.White, darkIcons = true)
         LaunchedEffect(true) {
             viewModel.setTextFieldState("")
             viewModel.setdate("")
@@ -236,6 +238,10 @@ class AddTaskScreen(
     }
 
     fun showAlarm(context: Context) {
+        if (viewModel.date.isEmpty()) {
+            Toast.makeText(context, "Pick date before picking time", Toast.LENGTH_SHORT).show()
+            return
+        }
         val dialog = TimePickerDialog(
             context,
             { p0, p1, p2 ->

@@ -13,10 +13,13 @@ class Category {
     var categoryName: String? = null
     @ColumnInfo
     var backgroundColor: Int? = null
+    @ColumnInfo
+    var textColor: Int? = null
 
     constructor()
-    constructor(categoryName: String?, backgroundColor: Int?) {
+    constructor(categoryName: String?, backgroundColor: Int?, textColor: Int?) {
         this.categoryName = categoryName
         this.backgroundColor = backgroundColor
+        this.textColor = textColor
     }
 }

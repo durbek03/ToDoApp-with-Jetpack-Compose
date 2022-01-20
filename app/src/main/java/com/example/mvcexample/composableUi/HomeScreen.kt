@@ -2,6 +2,7 @@ package com.example.mvcexample.composableUi
 
 import androidx.compose.animation.ExperimentalAnimationApi
 import androidx.compose.foundation.background
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.itemsIndexed
@@ -20,15 +21,22 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.example.mvcexample.R
 import com.example.mvcexample.globalui.CategoryItem
-import com.example.mvcexample.room.entity.Category
 import com.example.mvcexample.room.entity.CategoryWithTask
 import com.example.mvcexample.room.entity.Task
+import com.google.accompanist.systemuicontroller.rememberSystemUiController
+import java.util.*
 
-class HomeScreen(val categoryList: List<CategoryWithTask>?, val taskList: List<Task>?) {
+class HomeScreen(
+    val categoryList: List<CategoryWithTask>?,
+    val taskList: List<Task>?,
+    val listTaskSelection: ListTaskSelection
+) {
 
     @ExperimentalAnimationApi
     @Composable
     fun HomeScreen(modifier: Modifier = Modifier) {
+        val uiController = rememberSystemUiController()
+        uiController.setStatusBarColor(Color.White, darkIcons = true)
         Column(
             modifier = modifier
                 .fillMaxSize()
@@ -73,7 +81,7 @@ class HomeScreen(val categoryList: List<CategoryWithTask>?, val taskList: List<T
                 tint = colorResource(
                     id = R.color.blue
                 ),
-                modifier = Modifier.aspectRatio(0.8f, matchHeightConstraintsFirst = true)
+                modifier = Modifier.aspectRatio(0.6f, matchHeightConstraintsFirst = true)
             )
         }
     }
@@ -99,7 +107,12 @@ class HomeScreen(val categoryList: List<CategoryWithTask>?, val taskList: List<T
                 Spacer(modifier = Modifier.height(10.dp))
             }
             itemsIndexed(categoryList!!) { index, category ->
-                CategoryItem(category.category, category.taskList.size)
+                CategoryItem(
+                    category.category,
+                    category.taskList.size,
+                    modifier = Modifier.clickable {
+                        listTaskSelection.onListSelected(category)
+                    })
                 Spacer(modifier = Modifier.height(10.dp))
             }
         }
@@ -119,14 +132,29 @@ class HomeScreen(val categoryList: List<CategoryWithTask>?, val taskList: List<T
                         .clip(shape = RoundedCornerShape(50.dp))
                         .fillMaxWidth(0.08f)
                         .aspectRatio(1f)
-                        .background(colorResource(id = R.color.white)),
-                    painter = painterResource(id = R.drawable.ic_marked),
+                        .background(colorResource(id = R.color.white))
+                        .clickable {
+                            listTaskSelection.onTaskSelectedChanged(task = task)
+                        },
+                    painter = painterResource(id = if (task.isDone!!) R.drawable.ic_marked else R.drawable.ic_unmarked),
                     contentDescription = "ic_tick",
-                    tint = colorResource(id = R.color.blue)
+                    tint = colorResource(id = if (task.isDone!!) R.color.blue else R.color.black)
                 )
                 Column(modifier = Modifier.fillMaxWidth(0.8f)) {
-                    Text(text = task.title!!)
-                    Text(text = "alarm")
+                    Text(
+                        text = task.title!!,
+                        fontSize = 20.sp,
+                        fontWeight = FontWeight.Bold,
+                        color = Color.Black
+                    )
+                    Spacer(modifier = Modifier.height(5.dp))
+                    Row(modifier = Modifier.fillMaxWidth()) {
+                        if (task.time!!.isNotEmpty()) {
+                            TextWithIcon(str = task.time!!, icon = R.drawable.ic_alarm)
+                        } else if (task.date!!.isNotEmpty()) {
+                            TextWithIcon(str = task.date!!, icon = R.drawable.ic_calendar)
+                        }
+                    }
                 }
                 Surface(
                     color = colorResource(id = task.color!!),
@@ -142,4 +170,43 @@ class HomeScreen(val categoryList: List<CategoryWithTask>?, val taskList: List<T
         }
         Divider(thickness = 0.5.dp, color = Color.Gray, startIndent = 63.dp)
     }
+}
+
+@Composable
+fun TextWithIcon(str: String, icon: Int, modifier: Modifier = Modifier) {
+    Row(modifier = Modifier, verticalAlignment = Alignment.CenterVertically) {
+        var text = str
+        when {
+            text.contains('.') -> {
+                val isToday = text.checkIfToday()
+                if (isToday) text = "Today"
+            }
+        }
+        Icon(
+            modifier = Modifier
+                .width(17.dp)
+                .height(17.dp),
+            painter = painterResource(id = icon),
+            contentDescription = "",
+            tint = Color.Gray
+        )
+        Spacer(modifier = Modifier.width(5.dp))
+        Text(text = text, color = Color.Gray)
+    }
+}
+
+interface ListTaskSelection {
+    fun onTaskSelectedChanged(task: Task)
+    fun onListSelected(category: CategoryWithTask)
+}
+
+fun String.checkIfToday(): Boolean {
+    val calendar = Calendar.getInstance()
+    val calYear = calendar.get(Calendar.YEAR)
+    val calMonth = calendar.get(Calendar.MONTH)
+    val calDay = calendar.get(Calendar.DAY_OF_MONTH)
+    val year = this.substring(6).toInt()
+    val month = this.substring(3, 5).toInt().minus(1)
+    val day = this.substring(0, 2).toInt()
+    return calYear == year && calDay == day && calMonth == month
 }

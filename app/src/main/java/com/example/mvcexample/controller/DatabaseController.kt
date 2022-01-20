@@ -1,7 +1,6 @@
 package com.example.mvcexample.controller
 
-import android.util.Log
-import androidx.lifecycle.LiveData
+import android.content.Context
 import com.example.mvcexample.viewmodels.MainViewModel
 import com.example.mvcexample.room.database.AppDatabase
 import com.example.mvcexample.room.entity.Category
@@ -11,10 +10,16 @@ import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.collect
 import java.util.*
 
-class Controller(val appDatabase: AppDatabase, val viewModel: MainViewModel) {
+class DatabaseController(context: Context, val viewModel: MainViewModel) {
+
+    val appDatabase = AppDatabase.getInstance(context)
     private val TAG = "Controller"
-    suspend fun addTask(task: Task) {
-        appDatabase.taskDao().addTask(task)
+    suspend fun addTask(task: Task): Long {
+        return appDatabase.taskDao().addTask(task)
+    }
+
+    suspend fun updateTask(task: Task) {
+        appDatabase.taskDao().updateTask(task)
     }
 
     suspend fun getTodaysTask(): Flow<List<Task>> {

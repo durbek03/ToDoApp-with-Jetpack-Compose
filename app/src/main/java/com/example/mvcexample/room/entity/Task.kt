@@ -19,13 +19,28 @@ class Task {
     var time: String? = null
     @ColumnInfo
     var color: Int? = null
+    @ColumnInfo
+    var isDone: Boolean? = null
+    @ColumnInfo
+    var textColor: Int? = null
 
     constructor()
-    constructor(categoryId: Int?, title: String?, date: String?, time: String?, color: Int?) {
+    constructor(
+        categoryId: Int?,
+        title: String?,
+        date: String?,
+        time: String?,
+        color: Int?,
+        isDone: Boolean?,
+        textColor: Int?
+    ) {
         this.categoryId = categoryId
         this.title = title
         this.date = date
         this.time = time
         this.color = color
+        this.isDone = isDone
+        this.textColor = textColor
     }
+
 }

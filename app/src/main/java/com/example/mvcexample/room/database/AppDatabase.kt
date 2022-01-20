@@ -9,7 +9,7 @@ import com.example.mvcexample.room.dao.TaskDao
 import com.example.mvcexample.room.entity.Category
 import com.example.mvcexample.room.entity.Task
 
-@Database(entities = [Category::class, Task::class], version = 1)
+@Database(entities = [Category::class, Task::class], version = 2)
 abstract class AppDatabase: RoomDatabase() {
     abstract fun taskDao(): TaskDao
     abstract fun categoryDao(): CategoryDao
