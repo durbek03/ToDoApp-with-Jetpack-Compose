@@ -15,12 +15,7 @@ import com.example.mvcexample.room.entity.Category
 
 @Composable
 fun CategoryItem(category: Category, taskCount: Int, modifier: Modifier = Modifier) {
-    var sizeText = taskCount.toString()
-    if (sizeText.toInt() >= 0 && sizeText.toInt() != 1) {
-        sizeText += " tasks"
-    } else {
-        sizeText += " task"
-    }
+    val sizeText = taskCount.formatTaskAmountText()
 
     Surface(
         shape = RoundedCornerShape(10.dp),

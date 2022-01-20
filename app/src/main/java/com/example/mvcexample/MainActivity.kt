@@ -1,6 +1,7 @@
 package com.example.mvcexample
 
 import android.os.Bundle
+import android.util.Log
 import android.widget.Toast
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
@@ -31,6 +32,7 @@ import com.example.mvcexample.composableUi.HomeScreen
 import com.example.mvcexample.composableUi.ListTaskSelection
 import com.example.mvcexample.composableUi.ViewListScreen
 import com.example.mvcexample.controller.AlarmController
+import com.example.mvcexample.globalui.UpdateListDialog
 import com.example.mvcexample.navigation.Destinations
 import com.example.mvcexample.room.entity.Category
 import com.example.mvcexample.room.entity.CategoryWithTask
@@ -40,6 +42,7 @@ import com.example.mvcexample.utils.DialogItemPicker
 import com.example.mvcexample.viewmodels.AddTaskViewModel
 import com.example.mvcexample.viewmodels.FabControlViewModel
 import com.example.mvcexample.viewmodels.MainViewModel
+import com.example.mvcexample.viewmodels.ViewListViewModel
 import com.google.accompanist.systemuicontroller.rememberSystemUiController
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
@@ -52,6 +55,7 @@ class MainActivity : ComponentActivity() {
     lateinit var viewModel: MainViewModel
     lateinit var fabViewModel: FabControlViewModel
     lateinit var addTaskViewModel: AddTaskViewModel
+    lateinit var viewListViewModel: ViewListViewModel
     val TAG = "MAINACTIVITY"
 
     @ExperimentalAnimationApi
@@ -60,9 +64,11 @@ class MainActivity : ComponentActivity() {
         viewModel = ViewModelProvider(this)[MainViewModel::class.java]
         fabViewModel = ViewModelProvider(this)[FabControlViewModel::class.java]
         addTaskViewModel = ViewModelProvider(this)[AddTaskViewModel::class.java]
+        viewListViewModel = ViewModelProvider(this)[ViewListViewModel::class.java]
         setContent {
             MVCexampleTheme {
                 Surface(color = MaterialTheme.colors.background) {
+                    val context = LocalContext.current
                     databaseController =
                         DatabaseController(LocalContext.current, viewModel)
                     alarmController = AlarmController(LocalContext.current)
@@ -182,7 +188,28 @@ class MainActivity : ComponentActivity() {
                                 type = NavType.IntType
                             })
                         ) { entry ->
-                            val viewListScreen = ViewListScreen(viewModel, fabViewModel)
+                            val viewListScreen = ViewListScreen(
+                                viewListViewModel,
+                                viewModel,
+                                fabViewModel,
+                                object : ViewListScreen.OnTaskSelectChangedListener {
+                                    override fun onTaskSelectChanged(task: Task) {
+                                        task.isDone = !task.isDone!!
+                                        if (task.isDone!! && task.time!!.isNotEmpty()) {
+                                            alarmController.setAlarm(
+                                                task.id!!,
+                                                task.date!!,
+                                                task.time!!,
+                                                task.title!!
+                                            )
+                                        } else if (!task.isDone!! && task.time!!.isNotEmpty()) {
+                                            alarmController.disableAlarm(task.id!!)
+                                        }
+                                        scope.launch {
+                                            databaseController.updateTask(task)
+                                        }
+                                    }
+                                })
                             viewListScreen.ViewListScreen(entry.arguments!!.getInt("id"))
                         }
                     }
@@ -200,6 +227,7 @@ class MainActivity : ComponentActivity() {
 
                                 override fun listPicked() {
                                     fabViewModel.setShowListdialog(true)
+                                    viewListViewModel.setDialogVisibilityState(false)
                                     fabViewModel.setFabstate(FabState.NOTROTATED)
                                 }
                             })
@@ -219,7 +247,11 @@ class MainActivity : ComponentActivity() {
                                 fabViewModel.setShowListdialog(false)
                                 var textColor: Int
                                 val backColor = fabViewModel.selectedColorState
-                                textColor = if (backColor in listOf<Int>(R.color.grey, R.color.yellow)) R.color.dark_black else R.color.white
+                                textColor = if (backColor in listOf<Int>(
+                                        R.color.grey,
+                                        R.color.yellow
+                                    )
+                                ) R.color.dark_black else R.color.white
                                 val category = Category(
                                     fabViewModel.listDialogTextFieldState,
                                     fabViewModel.selectedColorState,
@@ -238,6 +270,24 @@ class MainActivity : ComponentActivity() {
                                 }
                             })
                         }
+                        AnimatedVisibility(visible = viewListViewModel.updateDialogVisibility) {
+                            UpdateListDialog(
+                                category = viewListViewModel.category,
+                                viewModel = viewListViewModel,
+                                addClicked = {
+                                    if (viewListViewModel.updateTFState.isEmpty()) {
+                                        Toast.makeText(
+                                            this@MainActivity,
+                                            "Enter name for List",
+                                            Toast.LENGTH_SHORT
+                                        ).show()
+                                        return@UpdateListDialog
+                                    }
+                                    scope.launch {
+
+                                    }
+                                })
+                        }
                     }
                 }
             }
@@ -245,8 +295,9 @@ class MainActivity : ComponentActivity() {
     }
 
     override fun onBackPressed() {
-        if (fabViewModel.showListDialog) {
+        if (fabViewModel.showListDialog && viewListViewModel.updateDialogVisibility) {
             fabViewModel.setShowListdialog(false)
+            viewListViewModel.setDialogVisibilityState(false)
         } else {
             super.onBackPressed()
         }

@@ -21,6 +21,8 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.example.mvcexample.R
 import com.example.mvcexample.globalui.CategoryItem
+import com.example.mvcexample.globalui.checkIfToday
+import com.example.mvcexample.globalui.checkIfTomorrow
 import com.example.mvcexample.room.entity.CategoryWithTask
 import com.example.mvcexample.room.entity.Task
 import com.google.accompanist.systemuicontroller.rememberSystemUiController
@@ -138,12 +140,12 @@ class HomeScreen(
                         },
                     painter = painterResource(id = if (task.isDone!!) R.drawable.ic_marked else R.drawable.ic_unmarked),
                     contentDescription = "ic_tick",
-                    tint = colorResource(id = if (task.isDone!!) R.color.blue else R.color.black)
+                    tint = colorResource(id = if (task.isDone!!) R.color.blue else R.color.dark_grey)
                 )
                 Column(modifier = Modifier.fillMaxWidth(0.8f)) {
                     Text(
                         text = task.title!!,
-                        fontSize = 20.sp,
+                        fontSize = 17.sp,
                         fontWeight = FontWeight.Bold,
                         color = Color.Black
                     )
@@ -153,6 +155,8 @@ class HomeScreen(
                             TextWithIcon(str = task.time!!, icon = R.drawable.ic_alarm)
                         } else if (task.date!!.isNotEmpty()) {
                             TextWithIcon(str = task.date!!, icon = R.drawable.ic_calendar)
+                        } else {
+                            Spacer(modifier = Modifier.height(10.dp))
                         }
                     }
                 }
@@ -178,8 +182,7 @@ fun TextWithIcon(str: String, icon: Int, modifier: Modifier = Modifier) {
         var text = str
         when {
             text.contains('.') -> {
-                val isToday = text.checkIfToday()
-                if (isToday) text = "Today"
+                if (text.checkIfToday()) text = "Today" else if (text.checkIfTomorrow()) text = "Tomorrow"
             }
         }
         Icon(
@@ -200,13 +203,3 @@ interface ListTaskSelection {
     fun onListSelected(category: CategoryWithTask)
 }
 
-fun String.checkIfToday(): Boolean {
-    val calendar = Calendar.getInstance()
-    val calYear = calendar.get(Calendar.YEAR)
-    val calMonth = calendar.get(Calendar.MONTH)
-    val calDay = calendar.get(Calendar.DAY_OF_MONTH)
-    val year = this.substring(6).toInt()
-    val month = this.substring(3, 5).toInt().minus(1)
-    val day = this.substring(0, 2).toInt()
-    return calYear == year && calDay == day && calMonth == month
-}
