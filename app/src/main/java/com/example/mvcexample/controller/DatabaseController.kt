@@ -1,7 +1,6 @@
 package com.example.mvcexample.controller
 
 import android.content.Context
-import com.example.mvcexample.R
 import com.example.mvcexample.viewmodels.MainViewModel
 import com.example.mvcexample.room.database.AppDatabase
 import com.example.mvcexample.room.entity.Category
@@ -21,10 +20,6 @@ class DatabaseController(context: Context, val viewModel: MainViewModel) {
 
     suspend fun updateTask(task: Task) {
         appDatabase.taskDao().updateTask(task)
-    }
-
-    suspend fun updateTaskColors(color: Int) {
-        appDatabase.taskDao()
     }
 
     suspend fun getTodaysTask(): Flow<List<Task>> {
@@ -56,5 +51,21 @@ class DatabaseController(context: Context, val viewModel: MainViewModel) {
             viewModel.setCategoryList(it)
         }
         return list
+    }
+
+    suspend fun updateCategory(category: Category, oldName: String): Boolean {
+        return if (category.categoryName == oldName) {
+            appDatabase.categoryDao().updateCategory(category = category)
+            true
+        } else {
+            val checkIfCategoryNameExists = appDatabase.categoryDao()
+                .checkIfCategoryNameExists(categoryName = category.categoryName!!)
+            if (checkIfCategoryNameExists != null) {
+                false
+            } else {
+                appDatabase.categoryDao().updateCategory(category = category)
+                true
+            }
+        }
     }
 }

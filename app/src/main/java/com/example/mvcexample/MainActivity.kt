@@ -72,10 +72,11 @@ class MainActivity : ComponentActivity() {
                     databaseController =
                         DatabaseController(LocalContext.current, viewModel)
                     alarmController = AlarmController(LocalContext.current)
-                    LaunchedEffect(true) {
+
+                    LaunchedEffect(viewListViewModel.updateDialogVisibility) {
                         databaseController.getCategoryWithTask()
                     }
-                    LaunchedEffect(key1 = true) {
+                    LaunchedEffect(true) {
                         databaseController.getTodaysTask()
                     }
 
@@ -132,7 +133,6 @@ class MainActivity : ComponentActivity() {
                             )
                         }
                         composable(Destinations.AddTaskScreen.route) {
-                            val context = LocalContext.current
                             fabViewModel.setFabvisibility(false)
                             val taskScreen = AddTaskScreen(
                                 addTaskViewModel,
@@ -155,15 +155,12 @@ class MainActivity : ComponentActivity() {
                                     ).show()
                                     return@AddTaskScreen
                                 }
-                                val textColor = addTaskViewModel.category!!.textColor
                                 val task = Task(
                                     addTaskViewModel.category!!.id,
                                     addTaskViewModel.taskTextFieldState,
                                     addTaskViewModel.date,
                                     addTaskViewModel.time,
-                                    addTaskViewModel.category!!.backgroundColor,
-                                    false,
-                                    textColor
+                                    false
                                 )
                                 scope.launch(Dispatchers.IO) {
                                     val id = databaseController.addTask(task = task)
@@ -209,7 +206,7 @@ class MainActivity : ComponentActivity() {
                                             databaseController.updateTask(task)
                                         }
                                     }
-                                })
+                                }, databaseController)
                             viewListScreen.ViewListScreen(entry.arguments!!.getInt("id"))
                         }
                     }
@@ -284,7 +281,19 @@ class MainActivity : ComponentActivity() {
                                         return@UpdateListDialog
                                     }
                                     scope.launch {
+                                        val backColor = viewListViewModel.selectedColorState
+                                        val textColor: Int = if (backColor in listOf(R.color.grey, R.color.yellow)) R.color.dark_black else R.color.white
+                                        val category = Category(viewListViewModel.updateTFState, viewListViewModel.selectedColorState, textColor)
+                                        category.id = viewListViewModel.category.id
 
+                                        val updateCategory = databaseController.updateCategory(
+                                            category,
+                                            viewListViewModel.category.categoryName!!
+                                        )
+                                        if (!updateCategory) {
+                                            Toast.makeText(context, "List with same name already exists", Toast.LENGTH_SHORT).show()
+                                        }
+                                        viewListViewModel.setDialogVisibilityState(false)
                                     }
                                 })
                         }

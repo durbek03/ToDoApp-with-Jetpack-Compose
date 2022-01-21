@@ -23,6 +23,7 @@ import com.example.mvcexample.R
 import com.example.mvcexample.globalui.CategoryItem
 import com.example.mvcexample.globalui.checkIfToday
 import com.example.mvcexample.globalui.checkIfTomorrow
+import com.example.mvcexample.room.entity.Category
 import com.example.mvcexample.room.entity.CategoryWithTask
 import com.example.mvcexample.room.entity.Task
 import com.google.accompanist.systemuicontroller.rememberSystemUiController
@@ -92,9 +93,9 @@ class HomeScreen(
     fun TodayTasks() {
         LazyColumn(modifier = Modifier.fillMaxWidth()) {
 
-            if (taskList != null) {
-                itemsIndexed(taskList) { index, task ->
-                    TaskItem(task)
+            for (i in categoryList!!) {
+                itemsIndexed(i.taskList) { index, task ->
+                    TaskItem(task = task, i.category)
                 }
             }
 
@@ -108,7 +109,7 @@ class HomeScreen(
                 )
                 Spacer(modifier = Modifier.height(10.dp))
             }
-            itemsIndexed(categoryList!!) { index, category ->
+            itemsIndexed(categoryList) { index, category ->
                 CategoryItem(
                     category.category,
                     category.taskList.size,
@@ -121,7 +122,7 @@ class HomeScreen(
     }
 
     @Composable
-    fun TaskItem(task: Task) {
+    fun TaskItem(task: Task, category: Category) {
         Column(modifier = Modifier.fillMaxWidth()) {
             Spacer(modifier = Modifier.height(8.dp))
             Row(
@@ -161,7 +162,7 @@ class HomeScreen(
                     }
                 }
                 Surface(
-                    color = colorResource(id = task.color!!),
+                    color = colorResource(id = category.backgroundColor!!),
                     shape = RoundedCornerShape(50.dp),
                     modifier = Modifier
                         .fillMaxWidth(0.15f)
@@ -182,7 +183,8 @@ fun TextWithIcon(str: String, icon: Int, modifier: Modifier = Modifier) {
         var text = str
         when {
             text.contains('.') -> {
-                if (text.checkIfToday()) text = "Today" else if (text.checkIfTomorrow()) text = "Tomorrow"
+                if (text.checkIfToday()) text = "Today" else if (text.checkIfTomorrow()) text =
+                    "Tomorrow"
             }
         }
         Icon(

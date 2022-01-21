@@ -32,6 +32,7 @@ import com.example.mvcexample.room.entity.Category
 import com.example.mvcexample.room.entity.CategoryWithTask
 import com.example.mvcexample.viewmodels.MainViewModel
 import com.example.mvcexample.R
+import com.example.mvcexample.controller.DatabaseController
 import com.example.mvcexample.globalui.*
 import com.example.mvcexample.room.entity.Task
 import com.example.mvcexample.viewmodels.AddTaskViewModel
@@ -46,6 +47,7 @@ class ViewListScreen(
     val mainviewModel: MainViewModel,
     val fabViewModel: FabControlViewModel,
     val taskSelectChangedListener: OnTaskSelectChangedListener,
+    val controller: DatabaseController
 ) {
     private val TAG = "ViewListScreen"
 
@@ -56,7 +58,8 @@ class ViewListScreen(
         fabViewModel.setFabvisibility(true)
         uiController.setStatusBarColor(Color.Black, darkIcons = false)
 
-        val categoryList = mainviewModel.categoryList.observeAsState().value
+        val categoryList = mainviewModel.categoryList.value
+
         val categoryWithTasks by produceState(
             initialValue = CategoryWithTask(
                 Category(),
@@ -124,7 +127,7 @@ class ViewListScreen(
                 Spacer(modifier = Modifier.height(40.dp))
                 TaskList(
                     taskList = categoryWithTasks.taskList,
-                    categoryWithTasks.category.backgroundColor!!
+                    categoryWithTasks.category
                 )
             }
         }
@@ -173,16 +176,16 @@ class ViewListScreen(
     }
 
     @Composable
-    fun TaskList(taskList: List<Task>, categoryColor: Int) {
+    fun TaskList(taskList: List<Task>, category: Category) {
         LazyColumn() {
             itemsIndexed(taskList) { index, task ->
-                ListTaskItem(task = task, categoryColor)
+                ListTaskItem(task = task, category)
             }
         }
     }
 
     @Composable
-    fun ListTaskItem(task: Task, categoryColor: Int) {
+    fun ListTaskItem(task: Task, category: Category) {
         Column(modifier = Modifier.fillMaxWidth()) {
             Spacer(modifier = Modifier.height(8.dp))
             Row(
@@ -195,7 +198,7 @@ class ViewListScreen(
                         .clip(shape = RoundedCornerShape(50.dp))
                         .fillMaxWidth(0.08f)
                         .aspectRatio(1f)
-                        .background(colorResource(id = categoryColor))
+                        .background(colorResource(id = category.backgroundColor!!))
                         .clickable {
                             taskSelectChangedListener.onTaskSelectChanged(task = task)
                         },
@@ -208,7 +211,7 @@ class ViewListScreen(
                         text = task.title!!,
                         fontSize = 17.sp,
                         fontWeight = FontWeight.Bold,
-                        color = colorResource(id = task.textColor!!)
+                        color = colorResource(id = category.textColor!!)
                     )
                     Spacer(modifier = Modifier.height(5.dp))
                     Row(modifier = Modifier.fillMaxWidth()) {
@@ -216,13 +219,13 @@ class ViewListScreen(
                             ListTextWithIcon(
                                 str = task.time!!,
                                 icon = R.drawable.ic_alarm,
-                                textColor = task.textColor!!
+                                textColor = category.textColor!!
                             )
                         } else if (task.date!!.isNotEmpty()) {
                             ListTextWithIcon(
                                 str = task.date!!,
                                 icon = R.drawable.ic_calendar,
-                                textColor = task.textColor!!
+                                textColor = category.textColor!!
                             )
                         } else {
                             Spacer(modifier = Modifier.height(10.dp))
@@ -230,7 +233,7 @@ class ViewListScreen(
                     }
                 }
                 Surface(
-                    color = colorResource(id = task.color!!),
+                    color = colorResource(id = category.backgroundColor!!),
                     shape = RoundedCornerShape(50.dp),
                     modifier = Modifier
                         .fillMaxWidth(0.15f)
