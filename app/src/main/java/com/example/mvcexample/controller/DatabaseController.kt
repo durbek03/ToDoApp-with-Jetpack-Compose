@@ -2,6 +2,7 @@ package com.example.mvcexample.controller
 
 import android.content.Context
 import android.util.Log
+import com.example.mvcexample.R
 import com.example.mvcexample.viewmodels.MainViewModel
 import com.example.mvcexample.room.database.AppDatabase
 import com.example.mvcexample.room.entity.Category
@@ -67,6 +68,22 @@ class DatabaseController(context: Context, val viewModel: MainViewModel) {
             } else {
                 appDatabase.categoryDao().updateCategory(category = category)
                 true
+            }
+        }
+    }
+
+    suspend fun addDefaultLists() {
+        val checkIfEmpty = appDatabase.categoryDao().checkIfEmpty()
+        if (checkIfEmpty == null) {
+            val categories = listOf(
+                Category("Inbox", R.color.grey, R.color.dark_black),
+                Category("Work", R.color.green, R.color.white),
+                Category("Shopping", R.color.red, R.color.white),
+                Category("Family", R.color.yellow, R.color.dark_black),
+                Category("Personal", R.color.purple, R.color.white)
+            )
+            categories.forEach { list ->
+                appDatabase.categoryDao().addCategory(list)
             }
         }
     }

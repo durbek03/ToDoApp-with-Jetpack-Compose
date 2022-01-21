@@ -79,6 +79,9 @@ class MainActivity : ComponentActivity() {
                     LaunchedEffect(true) {
                         databaseController.getTodaysTask()
                     }
+                    LaunchedEffect(true) {
+                        databaseController.addDefaultLists()
+                    }
 
                     val scope = rememberCoroutineScope()
                     val interactionSource = remember {

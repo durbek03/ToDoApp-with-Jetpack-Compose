@@ -22,4 +22,7 @@ interface CategoryDao {
 
     @Query("select * from category where categoryName = :categoryName")
     suspend fun checkIfCategoryNameExists(categoryName: String): Category?
+
+    @Query("select * from category order by id ASC LIMIT 1")
+    suspend fun checkIfEmpty(): Category?
 }
