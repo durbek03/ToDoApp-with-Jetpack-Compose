@@ -1,6 +1,7 @@
 package com.example.mvcexample.controller
 
 import android.content.Context
+import android.util.Log
 import com.example.mvcexample.viewmodels.MainViewModel
 import com.example.mvcexample.room.database.AppDatabase
 import com.example.mvcexample.room.entity.Category
@@ -48,6 +49,7 @@ class DatabaseController(context: Context, val viewModel: MainViewModel) {
     suspend fun getCategoryWithTask(): Flow<List<CategoryWithTask>> {
         val list = appDatabase.categoryDao().getAllDataFromCategory()
         list.collect {
+            Log.d(TAG, "getCategoryWithTask: new value")
             viewModel.setCategoryList(it)
         }
         return list

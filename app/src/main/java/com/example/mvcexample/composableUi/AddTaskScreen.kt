@@ -30,10 +30,12 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.navigation.NavController
 import com.example.mvcexample.R
+import com.example.mvcexample.globalui.formatTaskAmountText
 import com.example.mvcexample.room.entity.CategoryWithTask
 import com.example.mvcexample.viewmodels.AddTaskViewModel
 import com.example.mvcexample.viewmodels.MainViewModel
 import com.google.accompanist.systemuicontroller.rememberSystemUiController
+import java.util.*
 
 @ExperimentalAnimationApi
 class AddTaskScreen(
@@ -225,6 +227,10 @@ class AddTaskScreen(
     }
 
     fun showCalendar(context: Context) {
+        val calendar = Calendar.getInstance()
+        val calyear = calendar.get(Calendar.YEAR)
+        val calmonth = calendar.get(Calendar.MONTH)
+        val calday = calendar.get(Calendar.DAY_OF_MONTH)
         val datePickerDialog = DatePickerDialog(
             context,
             { p0, p1, p2, p3 ->
@@ -232,7 +238,7 @@ class AddTaskScreen(
                 val day = String.format("%02d", p3)
                 val date = "$day.$month.$p1"
                 viewModel.setdate(date)
-            }, 2022, 0, 19
+            }, calyear, calmonth, calday
         )
         datePickerDialog.show()
     }
@@ -270,12 +276,13 @@ class AddTaskScreen(
 
     @Composable
     fun Category(category: CategoryWithTask) {
+        val sizeText = category.taskList.size.formatTaskAmountText()
         Surface(
             modifier = Modifier
                 .fillMaxWidth()
                 .padding(20.dp, 7.dp)
                 .clickable { viewModel.setcategory(category.category) },
-            shape = RoundedCornerShape(5.dp),
+            shape = RoundedCornerShape(10.dp),
             color = colorResource(
                 id = category.category.backgroundColor!!
             )
@@ -283,7 +290,7 @@ class AddTaskScreen(
             Row(
                 modifier = Modifier
                     .fillMaxWidth()
-                    .padding(10.dp),
+                    .padding(15.dp),
                 verticalAlignment = Alignment.CenterVertically,
                 horizontalArrangement = Arrangement.SpaceBetween
             ) {
@@ -291,8 +298,9 @@ class AddTaskScreen(
                     modifier = Modifier
                         .fillMaxWidth(0.7f)
                 ) {
-                    Text(text = category.category.categoryName!!)
-                    Text(text = category.taskList.size.toString())
+                    Text(text = category.category.categoryName!!, color = colorResource(id = category.category.textColor!!), fontWeight = FontWeight.Bold, fontSize = 18.sp)
+                    Spacer(modifier = Modifier.height(7.dp))
+                    Text(text = sizeText, color = colorResource(id = category.category.textColor!!))
                 }
                 AnimatedVisibility(visible = viewModel.category?.id == category.category.id) {
                     Icon(

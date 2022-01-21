@@ -72,7 +72,7 @@ class MainActivity : ComponentActivity() {
                     databaseController =
                         DatabaseController(LocalContext.current, viewModel)
                     alarmController = AlarmController(LocalContext.current)
-
+                    Log.d(TAG, "onCreate: log working")
                     LaunchedEffect(viewListViewModel.updateDialogVisibility) {
                         databaseController.getCategoryWithTask()
                     }
@@ -98,14 +98,14 @@ class MainActivity : ComponentActivity() {
                                 HomeScreen(categoryList, taskList, object : ListTaskSelection {
                                     override fun onTaskSelectedChanged(task: Task) {
                                         task.isDone = !task.isDone!!
-                                        if (task.isDone!! && task.time!!.isNotEmpty()) {
+                                        if (!task.isDone!! && task.time!!.isNotEmpty()) {
                                             alarmController.setAlarm(
                                                 task.id!!,
                                                 task.date!!,
                                                 task.time!!,
                                                 task.title!!
                                             )
-                                        } else if (!task.isDone!! && task.time!!.isNotEmpty()) {
+                                        } else if (task.isDone!! && task.time!!.isNotEmpty()) {
                                             alarmController.disableAlarm(task.id!!)
                                         }
                                         scope.launch {
@@ -192,14 +192,14 @@ class MainActivity : ComponentActivity() {
                                 object : ViewListScreen.OnTaskSelectChangedListener {
                                     override fun onTaskSelectChanged(task: Task) {
                                         task.isDone = !task.isDone!!
-                                        if (task.isDone!! && task.time!!.isNotEmpty()) {
+                                        if (!task.isDone!! && task.time!!.isNotEmpty()) {
                                             alarmController.setAlarm(
                                                 task.id!!,
                                                 task.date!!,
                                                 task.time!!,
                                                 task.title!!
                                             )
-                                        } else if (!task.isDone!! && task.time!!.isNotEmpty()) {
+                                        } else if (task.isDone!! && task.time!!.isNotEmpty()) {
                                             alarmController.disableAlarm(task.id!!)
                                         }
                                         scope.launch {

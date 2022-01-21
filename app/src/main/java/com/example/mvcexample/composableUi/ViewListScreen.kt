@@ -60,22 +60,10 @@ class ViewListScreen(
 
         val categoryList = mainviewModel.categoryList.value
 
-        val categoryWithTasks by produceState(
-            initialValue = CategoryWithTask(
-                Category(),
-                listOf()
-            )
-        ) {
-            var cat: CategoryWithTask?
-            repeat(categoryList!!.size) {
-                if (categoryList[it].category.id == id) {
-                    cat = categoryList[it]
-                    value = cat!!
-                }
-            }
+        val categoryWithTasks by remember(categoryList) {
+            derivedStateOf { categoryList?.filter { it.category.id == id } }
         }
-
-        Log.d(TAG, "ViewListScreen: ${categoryWithTasks.category.categoryName}")
+        val categoryWithTask = categoryWithTasks!![0]
 
         Column(
             modifier = Modifier
@@ -92,8 +80,8 @@ class ViewListScreen(
                     .background(Color.Gray)
             )
         }
-        if (categoryWithTasks.category.categoryName != null) {
-            MainListScreen(categoryWithTasks = categoryWithTasks)
+        if (categoryWithTask.category.categoryName != null) {
+            MainListScreen(categoryWithTasks = categoryWithTask)
         }
     }
 
